@@ -1,0 +1,81 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafc;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #2a4365;
+}
+
+button {
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #2b6cb0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pet-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #edf2f7;
+  margin-bottom: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pet-card:hover {
+  background: #e2e8f0;
+}
+
+.activity {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.activity.resting {
+  color: #718096;
+}
+.activity.walking {
+  color: #2f855a;
+}
+.activity.running {
+  color: #d69e2e;
+}
+.activity.playing {
+  color: #e53e3e;
+}
+.activity.unknown {
+  color: #4a5568;
+}
