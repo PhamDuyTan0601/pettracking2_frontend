@@ -3,10 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const handleLogout = () => {
-    localStorage.removeItem("userId");
+    // Xóa tất cả items liên quan đến authentication
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userId"); // Xóa cả cái cũ nếu có
+
     navigate("/");
   };
 
@@ -28,29 +33,44 @@ function Navbar() {
             color: "white",
             textDecoration: "none",
             marginRight: "20px",
+            fontWeight: "bold",
           }}
         >
-          Dashboard
+          🏠 Dashboard
         </Link>
-        <Link to="/add-pet" style={{ color: "white", textDecoration: "none" }}>
-          Add Pet
+        <Link
+          to="/add-pet"
+          style={{
+            color: "white",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          ➕ Add Pet
         </Link>
       </div>
-      {userId && (
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "#e53e3e",
-            border: "none",
-            padding: "6px 12px",
-            borderRadius: "6px",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Logout
-        </button>
-      )}
+
+      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+        {user.name && (
+          <span style={{ fontSize: "14px" }}>👋 Hello, {user.name}</span>
+        )}
+        {token && (
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "#e53e3e",
+              border: "none",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              color: "white",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            🚪 Logout
+          </button>
+        )}
+      </div>
     </nav>
   );
 }
