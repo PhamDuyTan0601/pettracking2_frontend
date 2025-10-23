@@ -9,50 +9,56 @@ const API_URL =
 // ===============================
 // 👤 USER APIs
 // ===============================
+
+// Đăng ký tài khoản
 export const registerUser = (userData) =>
   axios.post(`${API_URL}/api/users/register`, userData);
 
-export const loginUser = (userData) =>
-  axios.post(`${API_URL}/api/users/login`, userData);
+// Đăng nhập, nhận token
+export const loginUser = async (userData) => {
+  const response = await axios.post(`${API_URL}/api/users/login`, userData);
+  if (response.data.token) {
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+  }
+  return response;
+};
+
+// Đăng xuất
+export const logoutUser = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};
 
 // ===============================
 // 🐾 PET APIs
 // ===============================
 
-// Lấy tất cả pet của user hiện tại (đã login)
-export const getPetsByUser = async () => {
+// Helper lấy token
+const getAuthHeader = () => {
   const token = localStorage.getItem("token");
-  return axios.get(`${API_URL}/api/pets/my-pets`, {
+  return {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  });
+  };
 };
 
-// Tạo pet mới (backend tự gán owner qua token)
-export const addPet = async (petData) => {
-  const token = localStorage.getItem("token");
-  return axios.post(`${API_URL}/api/pets`, petData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
+// Lấy danh sách pet của user hiện tại
+export const getPetsByUser = async () =>
+  axios.get(`${API_URL}/api/pets/my-pets`, getAuthHeader());
 
-// Lấy thông tin chi tiết 1 pet
-export const getPetById = async (petId) => {
-  const token = localStorage.getItem("token");
-  return axios.get(`${API_URL}/api/pets/${petId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
+// Tạo pet mới
+export const addPet = async (petData) =>
+  axios.post(`${API_URL}/api/pets`, petData, getAuthHeader());
+
+// Lấy chi tiết 1 pet
+export const getPetById = async (petId) =>
+  axios.get(`${API_URL}/api/pets/${petId}`, getAuthHeader());
 
 // ===============================
 // 📈 PET DATA APIs
 // ===============================
-
 export const getLatestPetData = (petId) =>
   axios.get(`${API_URL}/api/petData/pet/${petId}/latest`);
 
