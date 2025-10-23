@@ -7,12 +7,14 @@ function Navbar() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const handleLogout = () => {
-    // Xóa tất cả items liên quan đến authentication
+    // Xóa toàn bộ dữ liệu đăng nhập
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    localStorage.removeItem("userId"); // Xóa cả cái cũ nếu có
+    localStorage.removeItem("userId"); // Xóa luôn key cũ nếu có
 
+    // Làm mới trang để xoá cache React state
     navigate("/");
+    window.location.reload();
   };
 
   return (
@@ -38,6 +40,7 @@ function Navbar() {
         >
           🏠 Dashboard
         </Link>
+
         <Link
           to="/add-pet"
           style={{
