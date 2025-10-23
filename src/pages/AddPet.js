@@ -8,20 +8,24 @@ function AddPet() {
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
   const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await addPet(userId, { name, species, breed, age });
+      // Gửi đúng body cho backend
+      const petData = { name, species, breed, age: Number(age) };
+      const res = await addPet(petData);
+
       if (res.data.success) {
-        alert("Pet added successfully!");
+        alert("✅ Pet added successfully!");
         navigate("/dashboard");
       } else {
-        alert(res.data.message);
+        alert("❌ " + (res.data.message || "Failed to add pet"));
       }
     } catch (err) {
-      alert("Error adding pet");
+      console.error("Error adding pet:", err);
+      alert("❌ Server error while adding pet");
     }
   };
 
@@ -33,22 +37,26 @@ function AddPet() {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          required
         />
         <input
-          placeholder="Species"
+          placeholder="Species (dog / cat / other)"
           value={species}
           onChange={(e) => setSpecies(e.target.value)}
+          required
         />
         <input
           placeholder="Breed"
           value={breed}
           onChange={(e) => setBreed(e.target.value)}
+          required
         />
         <input
           placeholder="Age"
           type="number"
           value={age}
           onChange={(e) => setAge(e.target.value)}
+          required
         />
         <button type="submit">Add Pet</button>
       </form>
