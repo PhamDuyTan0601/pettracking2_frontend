@@ -40,10 +40,22 @@ function Navbar() {
           style={{
             color: "white",
             textDecoration: "none",
+            marginRight: "20px",
             fontWeight: "bold",
           }}
         >
           ➕ Add Pet
+        </Link>
+        {/* THÊM LINK DEVICES */}
+        <Link
+          to="/devices"
+          style={{
+            color: "white",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          📱 Devices
         </Link>
       </div>
 

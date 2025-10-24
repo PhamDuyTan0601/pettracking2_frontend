@@ -70,6 +70,26 @@ export const getAllPetData = async (petId) =>
   axios.get(`${API_URL}/api/petData/pet/${petId}`, getAuthHeader());
 
 // ===============================
+// 📱 DEVICE APIs
+// ===============================
+
+// Đăng ký device với pet
+export const registerDevice = async (deviceId, petId) =>
+  axios.post(
+    `${API_URL}/api/devices/register`,
+    { deviceId, petId },
+    getAuthHeader()
+  );
+
+// Lấy danh sách devices của user
+export const getMyDevices = async () =>
+  axios.get(`${API_URL}/api/devices/my-devices`, getAuthHeader());
+
+// Lấy thông tin pet từ deviceId (cho ESP32)
+export const getPetByDevice = async (deviceId) =>
+  axios.get(`${API_URL}/api/devices/pet/${deviceId}`);
+
+// ===============================
 // 🧩 AXIOS INTERCEPTOR
 // ===============================
 axios.interceptors.response.use(

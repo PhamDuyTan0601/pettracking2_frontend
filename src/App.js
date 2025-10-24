@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AddPet from "./pages/AddPet";
 import PetDetail from "./pages/PetDetail";
+import DeviceManagement from "./pages/DeviceManagement";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/add-pet" element={<AddPet />} />
         <Route path="/pet/:id" element={<PetDetail />} />
+        // Thêm vào Routes
+        <Route path="/devices" element={<DeviceManagement />} />
       </Routes>
     </BrowserRouter>
   );
