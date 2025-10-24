@@ -5,10 +5,13 @@ import { useNavigate, Link } from "react-router-dom";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const res = await loginUser({ email, password });
       if (res.data.success) {
@@ -18,13 +21,15 @@ function Login() {
         alert(res.data.message);
       }
     } catch (err) {
-      alert("❌ Login failed");
+      alert("❌ Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
+      <h2>Login to Pet Tracker</h2>
       <form onSubmit={handleSubmit}>
         <input
           placeholder="Email"
@@ -32,6 +37,7 @@ function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
         />
         <input
           placeholder="Password"
@@ -39,11 +45,14 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={loading}
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
       <p>
-        <Link to="/register">Register</Link> |{" "}
+        <Link to="/register">Create new account</Link> |{" "}
         <Link to="/forgot-password">Forgot Password?</Link>
       </p>
     </div>

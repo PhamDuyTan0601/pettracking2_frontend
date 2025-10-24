@@ -51,10 +51,13 @@ ul {
   border-radius: 10px;
   cursor: pointer;
   transition: 0.2s;
+  text-decoration: none;
+  color: inherit;
 }
 
 .pet-card:hover {
   background: #e2e8f0;
+  transform: translateY(-2px);
 }
 
 .activity {
@@ -78,4 +81,96 @@ ul {
 }
 .activity.unknown {
   color: #4a5568;
+}
+
+/* Auth Styles */
+.auth-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.auth-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.auth-container button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.auth-container p {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.auth-container a {
+  color: #3182ce;
+  text-decoration: none;
+}
+
+.auth-container a:hover {
+  text-decoration: underline;
+}
+
+/* Loading and Error States */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #4a5568;
+  font-style: italic;
+}
+
+.error {
+  color: #e53e3e;
+  text-align: center;
+  padding: 10px;
+  background: #fed7d7;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.pet-data {
+  background: #f7fafc;
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid #3182ce;
+}
+
+.pet-data p {
+  margin: 10px 0;
+  padding: 8px;
+  background: white;
+  border-radius: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .pet-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .auth-container {
+    margin: 20px auto;
+    padding: 20px;
+  }
 }

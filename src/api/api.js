@@ -38,8 +38,8 @@ export const forgotPassword = (email) =>
   axios.post(`${API_URL}/api/users/forgot-password`, { email });
 
 // Đặt lại mật khẩu (sau khi nhấn link trong email)
-export const resetPassword = (token, newPassword) =>
-  axios.post(`${API_URL}/api/users/reset-password/${token}`, { newPassword });
+export const resetPassword = (token, password) =>
+  axios.post(`${API_URL}/api/users/reset-password/${token}`, { password });
 
 // ===============================
 // 🐾 PET APIs

@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import AddPet from "./pages/AddPet";
+import PetDetail from "./pages/PetDetail";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/add-pet" element={<AddPet />} />
+        <Route path="/pet/:id" element={<PetDetail />} />
       </Routes>
     </BrowserRouter>
   );

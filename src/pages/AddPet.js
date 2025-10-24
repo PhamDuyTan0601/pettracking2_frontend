@@ -10,16 +10,22 @@ function AddPet() {
     breed: "",
     age: "",
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       await addPet(form);
-      alert("✅ Pet added!");
+      alert("✅ Pet added successfully!");
       navigate("/dashboard");
-    } catch {
-      alert("❌ Error adding pet");
+    } catch (err) {
+      alert("❌ Error adding pet. Please try again.");
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,31 +36,39 @@ function AddPet() {
         <h2>Add New Pet</h2>
         <form onSubmit={handleSubmit}>
           <input
-            placeholder="Name"
+            placeholder="Pet Name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
+            disabled={loading}
           />
           <input
-            placeholder="Species"
+            placeholder="Species (dog, cat, bird, etc.)"
             value={form.species}
             onChange={(e) => setForm({ ...form, species: e.target.value })}
             required
+            disabled={loading}
           />
           <input
             placeholder="Breed"
             value={form.breed}
             onChange={(e) => setForm({ ...form, breed: e.target.value })}
             required
+            disabled={loading}
           />
           <input
-            placeholder="Age"
+            placeholder="Age (years)"
             type="number"
+            min="0"
+            max="50"
             value={form.age}
             onChange={(e) => setForm({ ...form, age: e.target.value })}
             required
+            disabled={loading}
           />
-          <button type="submit">Add Pet</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Adding Pet..." : "Add Pet"}
+          </button>
         </form>
       </div>
     </>

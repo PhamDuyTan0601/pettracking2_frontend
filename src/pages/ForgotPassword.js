@@ -4,14 +4,21 @@ import { Link } from "react-router-dom";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
     try {
       await forgotPassword(email);
-      alert("📧 Password reset email sent!");
+      setMessage("📧 Password reset email sent! Check your inbox.");
     } catch {
-      alert("❌ Failed to send reset email");
+      setMessage("❌ Failed to send reset email. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -21,12 +28,23 @@ function ForgotPassword() {
       <form onSubmit={handleSubmit}>
         <input
           placeholder="Enter your registered email"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
         />
-        <button type="submit">Send Reset Link</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send Reset Link"}
+        </button>
       </form>
+
+      {message && (
+        <div className={message.includes("❌") ? "error" : "loading"}>
+          {message}
+        </div>
+      )}
+
       <p>
         <Link to="/login">Back to Login</Link>
       </p>

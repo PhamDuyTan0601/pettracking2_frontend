@@ -3,18 +3,27 @@ import { resetPassword } from "../api/api";
 import { useParams, useNavigate } from "react-router-dom";
 
 function ResetPassword() {
-  const [newPassword, setNewPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const { token } = useParams();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
     try {
-      await resetPassword(token, newPassword);
-      alert("✅ Password reset successful!");
-      navigate("/login");
+      await resetPassword(token, password);
+      setMessage("✅ Password reset successful!");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch {
-      alert("❌ Failed to reset password");
+      setMessage("❌ Failed to reset password. Token may be expired.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -23,14 +32,23 @@ function ResetPassword() {
       <h2>Reset Password</h2>
       <form onSubmit={handleSubmit}>
         <input
-          placeholder="Enter new password"
+          placeholder="Enter new password (min 6 characters)"
           type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={loading}
         />
-        <button type="submit">Reset Password</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Resetting..." : "Reset Password"}
+        </button>
       </form>
+
+      {message && (
+        <div className={message.includes("❌") ? "error" : "loading"}>
+          {message}
+        </div>
+      )}
     </div>
   );
 }
