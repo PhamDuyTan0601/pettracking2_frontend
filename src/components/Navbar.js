@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { logoutUser } from "../api/api";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -7,14 +8,8 @@ function Navbar() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const handleLogout = () => {
-    // Xóa toàn bộ dữ liệu đăng nhập
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("userId"); // Xóa luôn key cũ nếu có
-
-    // Làm mới trang để xoá cache React state
-    navigate("/");
-    window.location.reload();
+    logoutUser();
+    navigate("/login");
   };
 
   return (
@@ -40,7 +35,6 @@ function Navbar() {
         >
           🏠 Dashboard
         </Link>
-
         <Link
           to="/add-pet"
           style={{

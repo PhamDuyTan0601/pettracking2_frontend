@@ -1,66 +1,63 @@
 import React, { useState } from "react";
 import { addPet } from "../api/api";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function AddPet() {
-  const [name, setName] = useState("");
-  const [species, setSpecies] = useState("");
-  const [breed, setBreed] = useState("");
-  const [age, setAge] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    species: "",
+    breed: "",
+    age: "",
+  });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Gửi đúng body cho backend
-      const petData = { name, species, breed, age: Number(age) };
-      const res = await addPet(petData);
-
-      if (res.data.success) {
-        alert("✅ Pet added successfully!");
-        navigate("/dashboard");
-      } else {
-        alert("❌ " + (res.data.message || "Failed to add pet"));
-      }
-    } catch (err) {
-      console.error("Error adding pet:", err);
-      alert("❌ Server error while adding pet");
+      await addPet(form);
+      alert("✅ Pet added!");
+      navigate("/dashboard");
+    } catch {
+      alert("❌ Error adding pet");
     }
   };
 
   return (
-    <div className="container">
-      <h2>Add New Pet</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Species (dog / cat / other)"
-          value={species}
-          onChange={(e) => setSpecies(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Breed"
-          value={breed}
-          onChange={(e) => setBreed(e.target.value)}
-          required
-        />
-        <input
-          placeholder="Age"
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          required
-        />
-        <button type="submit">Add Pet</button>
-      </form>
-    </div>
+    <>
+      <Navbar />
+      <div className="container">
+        <h2>Add New Pet</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            placeholder="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Species"
+            value={form.species}
+            onChange={(e) => setForm({ ...form, species: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Breed"
+            value={form.breed}
+            onChange={(e) => setForm({ ...form, breed: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Age"
+            type="number"
+            value={form.age}
+            onChange={(e) => setForm({ ...form, age: e.target.value })}
+            required
+          />
+          <button type="submit">Add Pet</button>
+        </form>
+      </div>
+    </>
   );
 }
 

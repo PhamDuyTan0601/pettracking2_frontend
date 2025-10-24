@@ -1,42 +1,51 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser as login } from "../api/api";
+import { loginUser } from "../api/api";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const res = await login({ email, password });
+      const res = await loginUser({ email, password });
       if (res.data.success) {
-        localStorage.setItem("userId", res.data.user.id);
+        alert("✅ Login successful!");
         navigate("/dashboard");
       } else {
         alert(res.data.message);
       }
     } catch (err) {
-      alert("Login failed");
+      alert("❌ Login failed");
     }
   };
 
   return (
-    <div className="container">
+    <div className="auth-container">
       <h2>Login</h2>
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
-      <p onClick={() => navigate("/register")}>No account? Register</p>
+      <form onSubmit={handleSubmit}>
+        <input
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+      <p>
+        <Link to="/register">Register</Link> |{" "}
+        <Link to="/forgot-password">Forgot Password?</Link>
+      </p>
     </div>
   );
 }

@@ -14,11 +14,10 @@ const API_URL =
 export const registerUser = (userData) =>
   axios.post(`${API_URL}/api/users/register`, userData);
 
-// Đăng nhập và lưu token
+// Đăng nhập
 export const loginUser = async (userData) => {
   const response = await axios.post(`${API_URL}/api/users/login`, userData);
 
-  // ✅ Lưu token và user vào localStorage
   if (response.data.token) {
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -34,6 +33,14 @@ export const logoutUser = () => {
   localStorage.removeItem("userId");
 };
 
+// Quên mật khẩu (gửi email khôi phục)
+export const forgotPassword = (email) =>
+  axios.post(`${API_URL}/api/users/forgot-password`, { email });
+
+// Đặt lại mật khẩu (sau khi nhấn link trong email)
+export const resetPassword = (token, newPassword) =>
+  axios.post(`${API_URL}/api/users/reset-password/${token}`, { newPassword });
+
 // ===============================
 // 🐾 PET APIs
 // ===============================
@@ -41,6 +48,7 @@ export const logoutUser = () => {
 // Helper để gửi token
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found!");
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -52,19 +60,34 @@ const getAuthHeader = () => {
 export const getPetsByUser = async () =>
   axios.get(`${API_URL}/api/pets/my-pets`, getAuthHeader());
 
-// Tạo pet mới (backend tự gán owner qua token)
+// Tạo pet mới
 export const addPet = async (petData) =>
   axios.post(`${API_URL}/api/pets`, petData, getAuthHeader());
 
-// Lấy chi tiết 1 pet
+// Lấy chi tiết 1 pet (chỉ owner thấy)
 export const getPetById = async (petId) =>
   axios.get(`${API_URL}/api/pets/${petId}`, getAuthHeader());
 
 // ===============================
 // 📈 PET DATA APIs
 // ===============================
-export const getLatestPetData = (petId) =>
-  axios.get(`${API_URL}/api/petData/pet/${petId}/latest`);
+export const getLatestPetData = async (petId) =>
+  axios.get(`${API_URL}/api/petData/pet/${petId}/latest`, getAuthHeader());
 
-export const getAllPetData = (petId) =>
-  axios.get(`${API_URL}/api/petData/pet/${petId}`);
+export const getAllPetData = async (petId) =>
+  axios.get(`${API_URL}/api/petData/pet/${petId}`, getAuthHeader());
+
+// ===============================
+// 🧩 AXIOS INTERCEPTOR (TỰ ĐĂNG XUẤT NẾU TOKEN HẾT HẠN)
+// ===============================
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn("⚠️ Token expired or invalid. Logging out...");
+      logoutUser();
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
