@@ -33,14 +33,6 @@ export const logoutUser = () => {
   localStorage.removeItem("userId");
 };
 
-// Quên mật khẩu (gửi email khôi phục)
-export const forgotPassword = (email) =>
-  axios.post(`${API_URL}/api/users/forgot-password`, { email });
-
-// Đặt lại mật khẩu (sau khi nhấn link trong email)
-export const resetPassword = (token, password) =>
-  axios.post(`${API_URL}/api/users/reset-password/${token}`, { password });
-
 // ===============================
 // 🐾 PET APIs
 // ===============================
@@ -78,7 +70,7 @@ export const getAllPetData = async (petId) =>
   axios.get(`${API_URL}/api/petData/pet/${petId}`, getAuthHeader());
 
 // ===============================
-// 🧩 AXIOS INTERCEPTOR (TỰ ĐĂNG XUẤT NẾU TOKEN HẾT HẠN)
+// 🧩 AXIOS INTERCEPTOR
 // ===============================
 axios.interceptors.response.use(
   (response) => response,

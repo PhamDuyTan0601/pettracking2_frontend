@@ -52,8 +52,8 @@ function Login() {
         </button>
       </form>
       <p>
-        <Link to="/register">Create new account</Link> |{" "}
-        <Link to="/forgot-password">Forgot Password?</Link>
+        <Link to="/register">Create new account</Link>
+        {/* ĐÃ BỎ link forgot password */}
       </p>
     </div>
   );
