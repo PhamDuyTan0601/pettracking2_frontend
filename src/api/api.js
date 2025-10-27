@@ -60,9 +60,9 @@ export const addPet = async (petData) =>
 export const getPetById = async (petId) =>
   axios.get(`${API_URL}/api/pets/${petId}`, getAuthHeader());
 
-// Xóa pet - SỬA THÀNH POST METHOD
+// Xóa pet - SỬA LẠI THÀNH DELETE METHOD
 export const deletePet = async (petId) =>
-  axios.post(`${API_URL}/api/pets/delete`, { petId }, getAuthHeader());
+  axios.delete(`${API_URL}/api/pets/${petId}`, getAuthHeader());
 
 // ===============================
 // 📈 PET DATA APIs

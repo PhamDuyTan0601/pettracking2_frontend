@@ -23,7 +23,6 @@ function Dashboard() {
       const petsData = res.data.pets || [];
       setPets(petsData);
 
-      // Tự động chọn pet đầu tiên nếu có
       if (petsData.length > 0) {
         setSelectedPet(petsData[0]);
         await fetchPetData(petsData[0]._id);
@@ -86,14 +85,14 @@ function Dashboard() {
 
     setDeleting(true);
     try {
-      // Thử gọi API xóa pet
+      // Gọi API xóa pet từ backend
       await deletePet(petId);
 
-      // Xóa pet khỏi state local
+      // Cập nhật danh sách pets
       const updatedPets = pets.filter((pet) => pet._id !== petId);
       setPets(updatedPets);
 
-      // Cập nhật selected pet nếu pet đang chọn bị xóa
+      // Nếu pet đang được chọn bị xóa, chọn pet khác
       if (selectedPet && selectedPet._id === petId) {
         if (updatedPets.length > 0) {
           setSelectedPet(updatedPets[0]);
@@ -108,14 +107,11 @@ function Dashboard() {
     } catch (error) {
       console.error("Error deleting pet:", error);
 
-      // Hiển thị thông báo lỗi chi tiết
       let errorMessage = "Lỗi không xác định";
 
       if (error.response) {
-        // Lỗi từ server
         if (error.response.status === 404) {
-          errorMessage =
-            "API xóa pet không tồn tại. Vui lòng liên hệ quản trị viên.";
+          errorMessage = "Không tìm thấy pet để xóa.";
         } else if (error.response.status === 403) {
           errorMessage = "Bạn không có quyền xóa pet này.";
         } else {
@@ -124,11 +120,8 @@ function Dashboard() {
             `Lỗi server: ${error.response.status}`;
         }
       } else if (error.request) {
-        // Không nhận được response
-        errorMessage =
-          "Không thể kết nối đến server. Vui lòng kiểm tra kết nối internet.";
+        errorMessage = "Không thể kết nối đến server.";
       } else {
-        // Lỗi khác
         errorMessage = error.message;
       }
 
