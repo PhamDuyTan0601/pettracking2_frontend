@@ -19,6 +19,8 @@ function Dashboard() {
         const petsData = res.data.pets || [];
         setPets(petsData);
 
+        console.log("Fetched Pets:", petsData); // Debug
+
         // Tự động chọn pet đầu tiên nếu có
         if (petsData.length > 0) {
           setSelectedPet(petsData[0]);
@@ -36,10 +38,40 @@ function Dashboard() {
   const fetchPetData = async (petId) => {
     try {
       const res = await getAllPetData(petId);
-      setPetData(res.data.data || []);
+      const data = res.data.data || [];
+      setPetData(data);
+
+      console.log("Fetched Pet Data for", petId, ":", data); // Debug
+
+      // Nếu không có dữ liệu, tạo dữ liệu mẫu để test
+      if (data.length === 0) {
+        console.log("No data found, using sample data for testing");
+        const sampleData = [
+          {
+            latitude: 10.8231,
+            longitude: 106.6297,
+            activityType: "walking",
+            batteryLevel: 85,
+            speed: 1.2,
+            timestamp: new Date().toISOString(),
+          },
+        ];
+        setPetData(sampleData);
+      }
     } catch (err) {
       console.error("Error fetching pet data:", err);
-      setPetData([]);
+      // Tạo dữ liệu mẫu nếu API fail
+      const sampleData = [
+        {
+          latitude: 10.8231,
+          longitude: 106.6297,
+          activityType: "walking",
+          batteryLevel: 85,
+          speed: 1.2,
+          timestamp: new Date().toISOString(),
+        },
+      ];
+      setPetData(sampleData);
     }
   };
 
@@ -90,6 +122,22 @@ function Dashboard() {
 
             {selectedPet && (
               <>
+                {/* Debug Info */}
+                <div
+                  style={{
+                    background: "#f0f9ff",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    marginBottom: "20px",
+                    fontSize: "14px",
+                  }}
+                >
+                  <strong>Debug Info:</strong>
+                  Pet: {selectedPet.name} | Data Points: {petData.length} |
+                  Current Position: {petData[0]?.latitude},{" "}
+                  {petData[0]?.longitude}
+                </div>
+
                 {/* Stats Cards */}
                 <DashboardStats petData={petData} selectedPet={selectedPet} />
 

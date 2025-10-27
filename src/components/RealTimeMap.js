@@ -10,7 +10,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix cho marker icons
+// Fix cho marker icons - QUAN TRỌNG
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -66,11 +66,20 @@ export default function RealTimeMap({ petData, selectedPet }) {
   const [path, setPath] = useState([]);
   const mapRef = useRef();
 
+  console.log("Pet Data in Map:", petData); // Debug
+
   // Cập nhật vị trí real-time
   useEffect(() => {
-    if (petData && petData.length > 0) {
+    if (
+      petData &&
+      petData.length > 0 &&
+      petData[0].latitude &&
+      petData[0].longitude
+    ) {
       const latestData = petData[0];
       const newPosition = [latestData.latitude, latestData.longitude];
+
+      console.log("New Position:", newPosition); // Debug
 
       setCurrentPosition(newPosition);
       setPath((prev) => [...prev.slice(-50), newPosition]); // Giữ 50 điểm gần nhất
@@ -79,8 +88,20 @@ export default function RealTimeMap({ petData, selectedPet }) {
       if (mapRef.current) {
         mapRef.current.setView(newPosition, 16);
       }
+    } else {
+      // Set default position if no data
+      const defaultPosition = [10.8231, 106.6297]; // HCM City
+      setCurrentPosition(defaultPosition);
+      console.log("Using default position:", defaultPosition);
     }
   }, [petData]);
+
+  // THÊM CSS cho bản đồ
+  const mapStyle = {
+    height: "100%",
+    width: "100%",
+    minHeight: "400px",
+  };
 
   if (!currentPosition) {
     return (
@@ -94,16 +115,17 @@ export default function RealTimeMap({ petData, selectedPet }) {
   }
 
   return (
-    <div className="h-96 rounded-lg overflow-hidden shadow-lg">
+    <div className="h-96 rounded-lg overflow-hidden shadow-lg border-2 border-gray-300">
       <MapContainer
         center={currentPosition}
         zoom={16}
-        style={{ height: "100%", width: "100%" }}
+        style={mapStyle}
         ref={mapRef}
+        scrollWheelZoom={true}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
         {/* Vẽ đường đi */}
@@ -116,7 +138,7 @@ export default function RealTimeMap({ petData, selectedPet }) {
           <Marker
             position={currentPosition}
             icon={
-              activityIcons[petData[0]?.activityType] || activityIcons.resting
+              activityIcons[petData?.[0]?.activityType] || activityIcons.resting
             }
           >
             <Popup>
@@ -126,10 +148,13 @@ export default function RealTimeMap({ petData, selectedPet }) {
                 📍 {currentPosition[0].toFixed(6)},{" "}
                 {currentPosition[1].toFixed(6)}
                 <br />
-                🏃 {petData[0]?.activityType || "unknown"}
-                <br />⚡ {petData[0]?.batteryLevel || "N/A"}%
+                🏃 {petData?.[0]?.activityType || "unknown"}
+                <br />⚡ {petData?.[0]?.batteryLevel || "N/A"}%
                 <br />
-                🕐 {new Date(petData[0]?.timestamp).toLocaleTimeString()}
+                🕐{" "}
+                {petData?.[0]?.timestamp
+                  ? new Date(petData[0].timestamp).toLocaleTimeString()
+                  : "N/A"}
               </div>
             </Popup>
           </Marker>
