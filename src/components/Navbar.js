@@ -46,7 +46,6 @@ function Navbar() {
         >
           ➕ Add Pet
         </Link>
-        {/* THÊM LINK DEVICES */}
         <Link
           to="/devices"
           style={{
