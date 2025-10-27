@@ -41,7 +41,6 @@ function Dashboard() {
       const data = res.data.data || [];
       setPetData(data);
 
-      // Nếu không có dữ liệu, tạo dữ liệu mẫu để test
       if (data.length === 0) {
         const sampleData = [
           {
@@ -57,7 +56,6 @@ function Dashboard() {
       }
     } catch (err) {
       console.error("Error fetching pet data:", err);
-      // Tạo dữ liệu mẫu nếu API fail
       const sampleData = [
         {
           latitude: 10.8231,
@@ -88,13 +86,14 @@ function Dashboard() {
 
     setDeleting(true);
     try {
+      // Thử gọi API xóa pet
       await deletePet(petId);
 
-      // Cập nhật danh sách pets
+      // Xóa pet khỏi state local
       const updatedPets = pets.filter((pet) => pet._id !== petId);
       setPets(updatedPets);
 
-      // Nếu pet đang được chọn bị xóa, chọn pet khác
+      // Cập nhật selected pet nếu pet đang chọn bị xóa
       if (selectedPet && selectedPet._id === petId) {
         if (updatedPets.length > 0) {
           setSelectedPet(updatedPets[0]);
@@ -108,10 +107,32 @@ function Dashboard() {
       alert(`✅ Đã xóa pet "${petName}" thành công!`);
     } catch (error) {
       console.error("Error deleting pet:", error);
-      alert(
-        "❌ Lỗi khi xóa pet: " +
-          (error.response?.data?.message || "Unknown error")
-      );
+
+      // Hiển thị thông báo lỗi chi tiết
+      let errorMessage = "Lỗi không xác định";
+
+      if (error.response) {
+        // Lỗi từ server
+        if (error.response.status === 404) {
+          errorMessage =
+            "API xóa pet không tồn tại. Vui lòng liên hệ quản trị viên.";
+        } else if (error.response.status === 403) {
+          errorMessage = "Bạn không có quyền xóa pet này.";
+        } else {
+          errorMessage =
+            error.response.data?.message ||
+            `Lỗi server: ${error.response.status}`;
+        }
+      } else if (error.request) {
+        // Không nhận được response
+        errorMessage =
+          "Không thể kết nối đến server. Vui lòng kiểm tra kết nối internet.";
+      } else {
+        // Lỗi khác
+        errorMessage = error.message;
+      }
+
+      alert(`❌ Lỗi khi xóa pet: ${errorMessage}`);
     } finally {
       setDeleting(false);
     }
