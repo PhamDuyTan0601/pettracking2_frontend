@@ -60,6 +60,10 @@ export const addPet = async (petData) =>
 export const getPetById = async (petId) =>
   axios.get(`${API_URL}/api/pets/${petId}`, getAuthHeader());
 
+// Xóa pet
+export const deletePet = async (petId) =>
+  axios.delete(`${API_URL}/api/pets/${petId}`, getAuthHeader());
+
 // ===============================
 // 📈 PET DATA APIs
 // ===============================

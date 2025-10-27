@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getPetsByUser, getAllPetData } from "../api/api";
+import { getPetsByUser, getAllPetData, deletePet } from "../api/api";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import RealTimeMap from "../components/RealTimeMap";
@@ -11,29 +11,29 @@ function Dashboard() {
   const [selectedPet, setSelectedPet] = useState(null);
   const [petData, setPetData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const fetchPets = async () => {
-      try {
-        const res = await getPetsByUser();
-        const petsData = res.data.pets || [];
-        setPets(petsData);
-
-        console.log("Fetched Pets:", petsData); // Debug
-
-        // Tự động chọn pet đầu tiên nếu có
-        if (petsData.length > 0) {
-          setSelectedPet(petsData[0]);
-          await fetchPetData(petsData[0]._id);
-        }
-      } catch (err) {
-        console.error("Error loading pets:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPets();
   }, []);
+
+  const fetchPets = async () => {
+    try {
+      const res = await getPetsByUser();
+      const petsData = res.data.pets || [];
+      setPets(petsData);
+
+      // Tự động chọn pet đầu tiên nếu có
+      if (petsData.length > 0) {
+        setSelectedPet(petsData[0]);
+        await fetchPetData(petsData[0]._id);
+      }
+    } catch (err) {
+      console.error("Error loading pets:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchPetData = async (petId) => {
     try {
@@ -41,11 +41,8 @@ function Dashboard() {
       const data = res.data.data || [];
       setPetData(data);
 
-      console.log("Fetched Pet Data for", petId, ":", data); // Debug
-
       // Nếu không có dữ liệu, tạo dữ liệu mẫu để test
       if (data.length === 0) {
-        console.log("No data found, using sample data for testing");
         const sampleData = [
           {
             latitude: 10.8231,
@@ -78,6 +75,46 @@ function Dashboard() {
   const handlePetSelect = async (pet) => {
     setSelectedPet(pet);
     await fetchPetData(pet._id);
+  };
+
+  const handleDeletePet = async (petId, petName) => {
+    if (
+      !window.confirm(
+        `Bạn có chắc muốn xóa pet "${petName}"? Hành động này không thể hoàn tác.`
+      )
+    ) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      await deletePet(petId);
+
+      // Cập nhật danh sách pets
+      const updatedPets = pets.filter((pet) => pet._id !== petId);
+      setPets(updatedPets);
+
+      // Nếu pet đang được chọn bị xóa, chọn pet khác
+      if (selectedPet && selectedPet._id === petId) {
+        if (updatedPets.length > 0) {
+          setSelectedPet(updatedPets[0]);
+          await fetchPetData(updatedPets[0]._id);
+        } else {
+          setSelectedPet(null);
+          setPetData([]);
+        }
+      }
+
+      alert(`✅ Đã xóa pet "${petName}" thành công!`);
+    } catch (error) {
+      console.error("Error deleting pet:", error);
+      alert(
+        "❌ Lỗi khi xóa pet: " +
+          (error.response?.data?.message || "Unknown error")
+      );
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -122,22 +159,6 @@ function Dashboard() {
 
             {selectedPet && (
               <>
-                {/* Debug Info */}
-                <div
-                  style={{
-                    background: "#f0f9ff",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    marginBottom: "20px",
-                    fontSize: "14px",
-                  }}
-                >
-                  <strong>Debug Info:</strong>
-                  Pet: {selectedPet.name} | Data Points: {petData.length} |
-                  Current Position: {petData[0]?.latitude},{" "}
-                  {petData[0]?.longitude}
-                </div>
-
                 {/* Stats Cards */}
                 <DashboardStats petData={petData} selectedPet={selectedPet} />
 
@@ -155,7 +176,10 @@ function Dashboard() {
 
                 {/* Pet List */}
                 <div className="pet-list-section">
-                  <h3>📋 Danh Sách Pets Của Bạn</h3>
+                  <div className="section-header">
+                    <h3>📋 Danh Sách Pets Của Bạn</h3>
+                    <small>Tổng số: {pets.length} pet(s)</small>
+                  </div>
                   <div className="pets-grid">
                     {pets.map((pet) => (
                       <div
@@ -163,18 +187,31 @@ function Dashboard() {
                         className={`pet-card ${
                           selectedPet?._id === pet._id ? "active" : ""
                         }`}
-                        onClick={() => handlePetSelect(pet)}
                       >
-                        <div className="pet-info">
+                        <div
+                          className="pet-info"
+                          onClick={() => handlePetSelect(pet)}
+                          style={{ cursor: "pointer", flex: 1 }}
+                        >
                           <h4>{pet.name}</h4>
                           <p>
                             {pet.species} • {pet.breed}
                           </p>
                           <p>{pet.age} tuổi</p>
+                          <div className="pet-status">
+                            <span className="status-dot"></span>
+                            <span>Đang hoạt động</span>
+                          </div>
                         </div>
-                        <div className="pet-status">
-                          <span className="status-dot"></span>
-                          <span>Đang hoạt động</span>
+                        <div className="pet-actions">
+                          <button
+                            onClick={() => handleDeletePet(pet._id, pet.name)}
+                            disabled={deleting}
+                            className="delete-btn"
+                            title="Xóa pet"
+                          >
+                            {deleting ? "⏳" : "🗑️"}
+                          </button>
                         </div>
                       </div>
                     ))}
