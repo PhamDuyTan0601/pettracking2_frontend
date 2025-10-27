@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 
 export default function DashboardStats({ petData, selectedPet }) {
   const [stats, setStats] = useState({
-    totalDistance: 0,
-    avgSpeed: 0,
-    activityDistribution: {},
     batteryLevel: 0,
     lastUpdate: null,
+    activityType: "unknown",
   });
 
   useEffect(() => {
@@ -16,50 +14,12 @@ export default function DashboardStats({ petData, selectedPet }) {
   }, [petData]);
 
   const calculateStats = (data) => {
-    // Tính tổng quãng đường
-    let totalDistance = 0;
-    for (let i = 1; i < data.length; i++) {
-      const dist = calculateDistance(
-        data[i - 1].latitude,
-        data[i - 1].longitude,
-        data[i].latitude,
-        data[i].longitude
-      );
-      totalDistance += dist;
-    }
-
-    // Phân bố hoạt động
-    const activityDist = {};
-    data.forEach((item) => {
-      activityDist[item.activityType] =
-        (activityDist[item.activityType] || 0) + 1;
-    });
-
-    // Tốc độ trung bình
-    const avgSpeed =
-      data.reduce((sum, item) => sum + (item.speed || 0), 0) / data.length;
-
+    // Chỉ giữ lại pin và thời gian cập nhật
     setStats({
-      totalDistance: totalDistance * 1000, // Convert to meters
-      avgSpeed,
-      activityDistribution: activityDist,
       batteryLevel: data[0]?.batteryLevel || 0,
       lastUpdate: data[0]?.timestamp,
+      activityType: data[0]?.activityType || "unknown",
     });
-  };
-
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Earth radius in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
   };
 
   const StatCard = ({ title, value, unit, icon, color }) => (
@@ -77,42 +37,70 @@ export default function DashboardStats({ petData, selectedPet }) {
     </div>
   );
 
+  const ActivityBadge = ({ activityType }) => {
+    const activityConfig = {
+      resting: {
+        color: "bg-green-100 text-green-800",
+        icon: "🛌",
+        label: "Nghỉ ngơi",
+      },
+      walking: {
+        color: "bg-blue-100 text-blue-800",
+        icon: "🚶",
+        label: "Đang đi",
+      },
+      running: {
+        color: "bg-red-100 text-red-800",
+        icon: "🏃",
+        label: "Đang chạy",
+      },
+      playing: {
+        color: "bg-orange-100 text-orange-800",
+        icon: "🎾",
+        label: "Đang chơi",
+      },
+      unknown: {
+        color: "bg-gray-100 text-gray-800",
+        icon: "❓",
+        label: "Không xác định",
+      },
+    };
+
+    const config = activityConfig[activityType] || activityConfig.unknown;
+
+    return (
+      <div
+        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.color}`}
+      >
+        <span className="mr-2">{config.icon}</span>
+        {config.label}
+      </div>
+    );
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      {/* Pin */}
       <StatCard
-        title="Tổng quãng đường"
-        value={stats.totalDistance.toFixed(0)}
-        unit="m"
-        icon="🛣️"
-        color="border-blue-500"
-      />
-
-      <StatCard
-        title="Tốc độ trung bình"
-        value={stats.avgSpeed.toFixed(1)}
-        unit="m/s"
-        icon="⚡"
-        color="border-green-500"
-      />
-
-      <StatCard
-        title="Pin"
+        title="Mức pin"
         value={stats.batteryLevel}
         unit="%"
         icon="🔋"
         color="border-yellow-500"
       />
 
-      <StatCard
-        title="Cập nhật"
-        value={
-          stats.lastUpdate
-            ? new Date(stats.lastUpdate).toLocaleTimeString()
-            : "N/A"
-        }
-        icon="🕐"
-        color="border-purple-500"
-      />
+      {/* Trạng thái hoạt động */}
+      <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+        <div className="flex items-center">
+          <div className="text-2xl mr-4">📊</div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-500">Trạng thái</h3>
+            <div className="mt-2">
+              <ActivityBadge activityType={stats.activityType} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
